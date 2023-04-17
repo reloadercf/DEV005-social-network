@@ -46,7 +46,7 @@ export function navigateTo(hash) {
   }
 }
 
-window.addEventListener('popstate', (event) => {
+window.addEventListener('popstate', () => {
   console.log('change');
   navigateTo(window.location.pathname);
 });

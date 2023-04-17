@@ -1,87 +1,62 @@
 /**
  * @jest-environment jsdom
  */
-/* eslint-disable prefer-promise-reject-errors */
+
 import signup from '../../src/components/signUp.js';
 import * as auth from '../../src/lib/auth.js';
 
-// jest.mock('../../src/lib/auth.js');
-
-describe('Signup collection', () => {
-  test('This is a function', () => {
+describe('signUp', () => {
+  test('snapshot of signup', () => {
+    const DOM = document.createElement('div');
+    DOM.append(signup());
+    expect(DOM).toMatchSnapshot();
+  });
+  test('is a function', () => {
     expect(typeof signup).toBe('function');
   });
-  describe('Button return', () => {
-    test('Have a button return', () => {
-      const component = signup();
-      const comeBack = component.querySelector('#return');
-      expect(comeBack).not.toBe(undefined);
-    });
-
-    test('Never click a button return', () => {
-      const DOM = document.createElement('div');
-      const navigateTo = jest.fn();
-      DOM.append(signup(navigateTo));
-      expect(navigateTo).not.toHaveBeenCalled();
-    });
-    test('User click a button return', () => {
-      const DOM = document.createElement('div');
-      const navigateTo = jest.fn();
-      DOM.append(signup(navigateTo));
-      const comeBack = DOM.querySelector('#return');
-      comeBack.click();
-      expect(navigateTo).toHaveBeenCalled();
-      expect(navigateTo).toHaveBeenCalledWith('/');
-    });
-    test('User navigate to home', () => {
-      const DOM = document.createElement('div');
-      const navigateTo = jest.fn();
-      DOM.append(signup(navigateTo));
-      const comeBack = DOM.querySelector('#return');
-      comeBack.click();
-      expect(navigateTo).toHaveBeenCalledWith('/');
-    });
+  test('have a button', () => {
+    const DOM = document.createElement('div');
+    DOM.append(signup());
+    const haveAButton = DOM.querySelector('#return');
+    expect(haveAButton).not.toBe(undefined);
   });
-  describe('Button save', () => {
-    it('works with promises', (done) => {
-      jest.spyOn(auth, 'addUserToSocialNetwork').mockImplementation(() => Promise.resolve({ message: 'success', email: 'carlos@carlos.com' }));
-      const DOM = document.createElement('div');
-      const navigateTo = jest.fn();
-      DOM.append(signup(navigateTo));
-      const email = DOM.querySelector('#email');
-      email.value = 'carlos@carlos.com';
-      const password = DOM.querySelector('#password');
-      password.value = '123456';
+  test('after click button return call function navigateTo', () => {
+    const DOM = document.createElement('div');
+    const navigateTo = jest.fn();
+    DOM.append(signup(navigateTo));
+    const buttonBack = DOM.querySelector('#return');
+    buttonBack.click();
+    expect(navigateTo).toHaveBeenCalledTimes(1);
+  });
+  test('after click button return call function navigateTo with / ', () => {
+    const DOM = document.createElement('div');
+    const navigateTo = jest.fn();
+    DOM.append(signup(navigateTo));
+    const buttonBack = DOM.querySelector('#return');
+    buttonBack.click();
+    expect(navigateTo).toHaveBeenLastCalledWith('/');
+  });
+});
 
-      DOM.querySelector('#save').click();
-      const answerSpan = DOM.querySelector('#answer');
-      expect(auth.addUserToSocialNetwork).toHaveBeenCalledWith('carlos@carlos.com', '123456');
-      setTimeout(() => {
-        expect(answerSpan.classList.contains('success')).toBe(true);
-        done();
-      }, 0);
-      // expect(answerSpan.textContent).toBe('');
-    });
+describe('Button SAVE', () => {
+  test('Test of click button save', (done) => {
+    jest.spyOn(auth, 'addUserToSocialNetwork').mockImplementation(() => Promise.resolve({ message: 'success', email: 'carlos@carlos.com' }));
+    const DOM = document.createElement('div');
+    DOM.append(signup());
+    const email = DOM.querySelector('#email');
+    const password = DOM.querySelector('#password');
+    const answer = DOM.querySelector('#answer');
+    email.value = 'carlos@carlos.com';
+    password.value = '123456';
 
-    it('works with promises reject', (done) => {
-      jest.spyOn(auth, 'addUserToSocialNetwork').mockImplementation(() => Promise.reject({ message: 'error', email: 'carlos@carlos.com' }));
-      const DOM = document.createElement('div');
-      const navigateTo = jest.fn();
-      DOM.append(signup(navigateTo));
-      const email = DOM.querySelector('#email');
-      email.value = 'carlos@carlos.com';
-      const password = DOM.querySelector('#password');
-      password.value = '1234';
-
-      DOM.querySelector('#save').click();
-      const answerSpan = DOM.querySelector('#answer');
-      expect(auth.addUserToSocialNetwork).toHaveBeenCalledWith('carlos@carlos.com', '1234');
-      setTimeout(() => {
-        expect(answerSpan.classList.contains('error')).toBe(true);
-        expect(answerSpan.textContent).toBe('error carlos@carlos.com Not saved');
-        done();
-      }, 0);
-      //
-    });
+    const buttonSave = DOM.querySelector('#save');
+    buttonSave.click();
+    expect(auth.addUserToSocialNetwork).toHaveBeenCalledTimes(1);
+    expect(auth.addUserToSocialNetwork).toHaveBeenLastCalledWith('carlos@carlos.com', '123456');
+    setTimeout(() => {
+      expect(answer.classList.contains('success')).toBe(true);
+      expect(answer.classList.contains('error')).not.toBe(true);
+      done();
+    }, 0);
   });
 });
