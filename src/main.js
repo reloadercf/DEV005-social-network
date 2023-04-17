@@ -2,6 +2,7 @@ import home from './components/home.js';
 import about from './components/about.js';
 import contact from './components/contact.js';
 import errorPath from './components/errorPaht.js';
+import signup from './components/signUp.js';
 
 // Define the routes and corresponding components
 const routes = [
@@ -9,6 +10,7 @@ const routes = [
   { path: '/about', component: about },
   { path: '/contact', component: contact },
   { path: '/error', component: errorPath },
+  { path: '/signup', component: signup },
 ];
 
 const root = document.getElementById('content');

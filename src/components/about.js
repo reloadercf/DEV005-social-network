@@ -5,7 +5,7 @@ function about(navigateTo) {
   `;
   container.innerHTML = html;
   container.querySelector('#return').addEventListener('click', () => {
-    navigateTo('/home');
+    navigateTo('/');
   });
 
   return container;
