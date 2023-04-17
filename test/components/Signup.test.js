@@ -2,10 +2,10 @@
  * @jest-environment jsdom
  */
 import signup from '../../src/components/signUp.js';
-// import { addUserToSocialNetwork } from '../../src/lib/__mock__/auth.js';
+import * as auth from '../../src/lib/auth.js';
 
 // jest.mock('../../src/lib/auth.js');
-
+jest.spyOn(auth, 'addUserToSocialNetwork').mockImplementation(() => Promise.resolve({ message: 'success', email: 'carlos@carlos.com' }));
 describe('Signup collection', () => {
   test('This is a function', () => {
     expect(typeof signup).toBe('function');
@@ -42,7 +42,7 @@ describe('Signup collection', () => {
     });
   });
   describe('Button save', () => {
-    it('works with promises', async () => {
+    it('works with promises', (done) => {
       const DOM = document.createElement('div');
       const navigateTo = jest.fn();
       DOM.append(signup(navigateTo));
@@ -53,9 +53,12 @@ describe('Signup collection', () => {
 
       DOM.querySelector('#save').click();
       const answerSpan = DOM.querySelector('#answer');
-      // expect(addUserToSocialNetwork).toHaveBeenCalledWith('carlos@carlos.com', '123456');
+      expect(auth.addUserToSocialNetwork).toHaveBeenCalledWith('carlos@carlos.com', '123456');
+      setTimeout(() => {
+        expect(answerSpan.classList.contains('success')).toBe(true);
+        done();
+      }, 0);
       // expect(answerSpan.textContent).toBe('');
-      expect(answerSpan.classList.contains('success')).toBe(true);
-    }, 1000);
+    });
   });
 });

@@ -51,3 +51,5 @@ function initRouter() {
 
 // Start the router
 initRouter();
+
+export { navigateTo };
