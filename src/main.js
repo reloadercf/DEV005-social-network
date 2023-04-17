@@ -13,12 +13,19 @@ const routes = [
   { path: '/signup', component: signup },
 ];
 
-const root = document.getElementById('content');
+let root = document.getElementById('content');
+if (!root) {
+  const rootChild = document.createElement('div');
+  rootChild.id = 'content';
+  document.body.appendChild(rootChild);
+  root = rootChild;
+}
+
 // Define the default route
 const defaultRoute = '/';
 
 // Navigate to the requested route
-function navigateTo(hash) {
+export function navigateTo(hash) {
   // Find the matching route
   const route = routes.find((r) => r.path === hash);
 
@@ -39,10 +46,17 @@ function navigateTo(hash) {
   }
 }
 
+window.addEventListener('popstate', (event) => {
+  console.log('change');
+  navigateTo(window.location.pathname);
+});
+
+/*
 window.onpopstate = () => {
   console.log('change');
   navigateTo(window.location.pathname);
 };
+*/
 
 // Initialize the router
 function initRouter() {
@@ -51,5 +65,3 @@ function initRouter() {
 
 // Start the router
 initRouter();
-
-export { navigateTo };

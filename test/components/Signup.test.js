@@ -1,11 +1,12 @@
 /**
  * @jest-environment jsdom
  */
+/* eslint-disable prefer-promise-reject-errors */
 import signup from '../../src/components/signUp.js';
 import * as auth from '../../src/lib/auth.js';
 
 // jest.mock('../../src/lib/auth.js');
-jest.spyOn(auth, 'addUserToSocialNetwork').mockImplementation(() => Promise.resolve({ message: 'success', email: 'carlos@carlos.com' }));
+
 describe('Signup collection', () => {
   test('This is a function', () => {
     expect(typeof signup).toBe('function');
@@ -43,6 +44,7 @@ describe('Signup collection', () => {
   });
   describe('Button save', () => {
     it('works with promises', (done) => {
+      jest.spyOn(auth, 'addUserToSocialNetwork').mockImplementation(() => Promise.resolve({ message: 'success', email: 'carlos@carlos.com' }));
       const DOM = document.createElement('div');
       const navigateTo = jest.fn();
       DOM.append(signup(navigateTo));
@@ -59,6 +61,27 @@ describe('Signup collection', () => {
         done();
       }, 0);
       // expect(answerSpan.textContent).toBe('');
+    });
+
+    it('works with promises reject', (done) => {
+      jest.spyOn(auth, 'addUserToSocialNetwork').mockImplementation(() => Promise.reject({ message: 'error', email: 'carlos@carlos.com' }));
+      const DOM = document.createElement('div');
+      const navigateTo = jest.fn();
+      DOM.append(signup(navigateTo));
+      const email = DOM.querySelector('#email');
+      email.value = 'carlos@carlos.com';
+      const password = DOM.querySelector('#password');
+      password.value = '1234';
+
+      DOM.querySelector('#save').click();
+      const answerSpan = DOM.querySelector('#answer');
+      expect(auth.addUserToSocialNetwork).toHaveBeenCalledWith('carlos@carlos.com', '1234');
+      setTimeout(() => {
+        expect(answerSpan.classList.contains('error')).toBe(true);
+        expect(answerSpan.textContent).toBe('error carlos@carlos.com Not saved');
+        done();
+      }, 0);
+      //
     });
   });
 });
